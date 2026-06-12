@@ -4,31 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'Admin Panel' }}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#eaf4fb',
-                            100: '#d3e8f7',
-                            200: '#a7d0ee',
-                            300: '#7ab7e4',
-                            400: '#4f95cc',
-                            500: '#3b7597',
-                            600: '#305f77',
-                            700: '#264955',
-                            800: '#1c3340',
-                            900: '#10212a',
+    @if (file_exists(public_path('build/manifest.json')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @else
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            brand: {
+                                50: '#eaf4fb',
+                                100: '#d3e8f7',
+                                200: '#a7d0ee',
+                                300: '#7ab7e4',
+                                400: '#4f95cc',
+                                500: '#3b7597',
+                                600: '#305f77',
+                                700: '#264955',
+                                800: '#1c3340',
+                                900: '#10212a',
+                            },
                         },
+                        fontFamily: { sans: ['Inter', 'sans-serif'] },
                     },
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                 },
-            },
-        }
-    </script>
+            }
+        </script>
+    @endif
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .tostter-container { position: fixed; top: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.75rem; pointer-events: none; }
+        .tostter-card { min-width: 300px; max-width: 360px; display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem; border-radius: 1rem; box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12); opacity: 0; transform: translateY(0.75rem); transition: transform 180ms ease, opacity 180ms ease; pointer-events: auto; }
+        .tostter-card.show { opacity: 1; transform: translateY(0); }
+        .tostter-card button { background: transparent; border: none; color: inherit; cursor: pointer; font-size: 1.1rem; line-height: 1; }
     <style>
         .tostter-container { position: fixed; top: 1rem; right: 1rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.75rem; pointer-events: none; }
         .tostter-card { min-width: 300px; max-width: 360px; display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem; border-radius: 1rem; box-shadow: 0 20px 50px rgba(15, 23, 42, 0.12); opacity: 0; transform: translateY(0.75rem); transition: transform 180ms ease, opacity 180ms ease; pointer-events: auto; }

@@ -9,16 +9,53 @@
     @if(!empty($settings['favicon_url']))
         <link rel="icon" href="{{ $settings['favicon_url'] }}">
     @endif
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        primary: '#093C5D',
+    @if (file_exists(public_path('build/manifest.json')))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @else
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            sans: ['Inter', 'sans-serif'],
+                        },
+                        colors: {
+                            primary: '#093C5D',
+                            secondary: '#3B7597',
+                            brand: {
+                                50: '#F4F8FB',
+                                100: '#E9F1F6',
+                                200: '#D5E4EE',
+                                500: '#093C5D',
+                                600: '#093C5D',
+                                700: '#072D4B',
+                                800: '#062A47'
+                            },
+                            accent: {
+                                50: '#EAF2F7',
+                                500: '#3B7597',
+                                600: '#3B7597',
+                                700: '#316582'
+                            }
+                        }
+                    }
+                }
+            }
+        </script>
+    @endif
+    <style>
+        :root {
+            --color-primary: #093C5D;
+            --color-secondary: #3B7597;
+            --color-background: #F4F8FB;
+            --color-surface: #FFFFFF;
+            --color-text-primary: #102A43;
+            --color-text-secondary: #486581;
+            --color-border: #D9E2EC;
+            --color-success: #2E8B57;
+            --color-error: #D64545;
+            --brand-primary: {{ $settings['primary_color'] ?? '#093C5D' }};
                         secondary: '#3B7597',
                         brand: {
                             50: '#F4F8FB',

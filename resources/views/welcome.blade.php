@@ -1,11 +1,26 @@
 @extends('layouts.app')
 
 @section('content')
+@php
+    $normalizeSection = fn($items) => collect($items)
+        ->map(fn($item) => is_array($item) ? (object) $item : $item)
+        ->filter(fn($item) => is_object($item));
+
+    $heroSections = $normalizeSection($heroSections);
+    $aboutSections = $normalizeSection($aboutSections);
+    $biographies = $normalizeSection($biographies);
+    $services = $normalizeSection($services);
+    $education = $normalizeSection($education);
+    $reviews = $normalizeSection($reviews);
+    $blogs = $normalizeSection($blogs);
+    $clinics = $normalizeSection($clinics);
+    $sections = collect($sections);
+@endphp
 <div class="fixed right-6 bottom-6 z-50">
     <button id="translationToggleButton" class="rounded-full bg-brand-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 hover:bg-brand-700 transition-all duration-150">Translate to বাংলা</button>
 </div>
 @foreach($heroSections as $hero)
-<section class="min-h-screen bg-gradient-to-br from-brand-600 via-brand-700 to-accent-700 text-white">
+<section class="min-h-screen bg-brand-600 text-white">
     <div class="max-w-7xl mx-auto px-6 py-20 lg:py-28 grid lg:grid-cols-2 gap-12 items-center">
         <div>
             <h1 class="text-5xl font-extrabold tracking-tight leading-tight">{{ $hero->title }}</h1>
@@ -236,13 +251,13 @@
         <div class="max-w-2xl mb-10 text-center mx-auto">
             <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Schedule</p>
             <h2 class="text-2xl font-bold text-slate-900 tracking-tight mt-3">Available Consultation Slots</h2>
-            <p class="text-sm text-slate-600 mt-4">Visit the doctor at either clinic location based on your convenience</p>
+            <p class="text-sm text-slate-600 mt-4">Visit the doctor at any of our {{ $clinics->count() }} clinic{{ $clinics->count() === 1 ? '' : 's' }} locations based on your convenience.</p>
         </div>
-        <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-4 pb-4">
+        <div class="flex flex-wrap justify-center gap-6 pb-4">
                 @foreach($clinics as $clinic)
                     @foreach($clinic->schedules as $schedule)
                         @if(!$schedule->is_closed)
-                            <div class="bg-gradient-to-br from-brand-50 to-accent-50 rounded-2xl shadow-sm border border-brand-200 p-6 hover:shadow-lg transition-all duration-300 flex flex-col">
+                            <div class="w-full sm:w-[calc(50%-1.5rem)] xl:w-[calc(25%-1.5rem)] bg-gradient-to-br from-brand-50 to-accent-50 rounded-2xl shadow-sm border border-brand-200 p-6 hover:shadow-lg transition-all duration-300 flex flex-col">
                                 <div class="flex items-start justify-between mb-4">
                                     <div class="w-12 h-12 rounded-2xl bg-brand-600 text-white flex items-center justify-center">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -274,11 +289,11 @@
                                         <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                                         </svg>
-                                        <span>{{ $clinic->phone }}</span>
+                                        <span>{{ data_get($clinic, 'phones.0') }}</span>
                                     </div>
                                 </div>
                                 </div>
-                                <a href="{{ $sections->get('contact')->button_link ?? '#book' }}" class="mt-auto w-full bg-brand-600 hover:bg-brand-700 text-white font-medium px-4 py-2.5 rounded-lg shadow-sm transition-all duration-150 text-center block">{{ $sections->get('contact')->button_text ?? 'Book This Slot' }}</a>
+                                <a href="{{ $sections->get('contact')->button_link ?? '#book' }}" class="mt-4 w-full bg-brand-600 hover:bg-brand-700 text-white font-medium px-4 py-2.5 rounded-lg shadow-sm transition-all duration-150 text-center block">{{ $sections->get('contact')->button_text ?? 'Book This Slot' }}</a>
                             </div>
                         @endif
                     @endforeach
@@ -354,7 +369,7 @@
                 @if($sections->get('contact')->content)
                     <p class="text-sm text-slate-600 mt-4">{{ $sections->get('contact')->content }}</p>
                 @endif
-                @if($errors->any())
+                @if(isset($errors) && $errors->any())
                     <div class="mt-5 bg-red-50 text-red-700 border border-red-200 px-4 py-3 rounded-2xl text-sm">
                         Please review the form.
                     </div>
@@ -366,9 +381,9 @@
                         <button type="button" id="existingPatientButton" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-150">Existing Patient</button>
                     </div>
                     <div id="existingPatientSection" class="mt-4 hidden rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                        <p class="text-sm text-slate-600 mb-3">Enter your existing Patient ID from a previous appointment.</p>
+                        <p class="text-sm text-slate-600 mb-3">Enter your existing Patient UID from a previous appointment.</p>
                         <div class="flex flex-col gap-3 sm:flex-row">
-                            <input type="text" id="existingPatientId" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600 transition-all duration-150" placeholder="Patient ID">
+                            <input type="text" id="existingPatientUid" class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600 transition-all duration-150" placeholder="Patient UID">
                             <button type="button" id="lookupPatientButton" class="inline-flex items-center justify-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-all duration-150">Find Patient</button>
                         </div>
                         <p id="existingPatientMessage" class="mt-2 text-sm text-red-500"></p>
@@ -377,7 +392,7 @@
 
                 <form action="{{ route('appointments.store') }}" method="POST" class="mt-6">
                     @csrf
-                    <input type="hidden" id="patientId" name="patient_id" value="{{ old('patient_id') }}">
+                    <input type="hidden" id="patientUid" name="patient_uid" value="{{ old('patient_uid') }}">
                     <input type="hidden" id="sexFallback" value="{{ old('sex') }}">
                     <div class="grid md:grid-cols-2 gap-5">
                         <div>
@@ -436,15 +451,15 @@
         const newPatientButton = document.getElementById('newPatientButton');
         const existingPatientButton = document.getElementById('existingPatientButton');
         const existingPatientSection = document.getElementById('existingPatientSection');
-        const existingPatientId = document.getElementById('existingPatientId');
+        const existingPatientUid = document.getElementById('existingPatientUid');
         const lookupPatientButton = document.getElementById('lookupPatientButton');
         const existingPatientMessage = document.getElementById('existingPatientMessage');
-        const patientIdInput = document.getElementById('patientId');
+        const patientUidInput = document.getElementById('patientUid');
         const sexSelect = document.getElementById('sexSelect');
         const sexFallback = document.getElementById('sexFallback');
         const patientLockFields = Array.from(document.querySelectorAll('[data-existing-disable]'));
         const patientLookupUrlBase = '{{ url('/appointments/patient') }}';
-        const startExistingMode = '{{ old('patient_id') ? '1' : '0' }}' === '1';
+        const startExistingMode = '{{ old('patient_uid') ? '1' : '0' }}' === '1';
 
         function setPatientMode(mode) {
             const selectedClasses = ['border-brand-600', 'bg-brand-600', 'text-white'];
@@ -465,7 +480,7 @@
                 existingPatientSection.classList.add('hidden');
                 applyClasses(newPatientButton, selectedClasses);
                 applyClasses(existingPatientButton, unselectedClasses);
-                patientIdInput.value = '';
+                patientUidInput.value = '';
                 existingPatientMessage.textContent = '';
                 setPatientFieldsReadOnly(false);
                 setSexFallback(false);
@@ -502,9 +517,9 @@
         }
 
         async function lookupPatient() {
-            const id = existingPatientId.value.trim();
-            if (!id) {
-                showError('Please enter a valid Patient ID.');
+            const uid = existingPatientUid.value.trim();
+            if (!uid) {
+                showError('Please enter a valid Patient UID.');
                 return;
             }
             showError('');
@@ -512,7 +527,7 @@
             lookupPatientButton.textContent = 'Searching...';
 
             try {
-                const response = await fetch(`${patientLookupUrlBase}/${encodeURIComponent(id)}`);
+                const response = await fetch(`${patientLookupUrlBase}/${encodeURIComponent(uid)}`);
                 if (!response.ok) {
                     throw new Error('Patient not found');
                 }
@@ -522,13 +537,13 @@
                 document.getElementById('patientEmail').value = patient.email || '';
                 document.getElementById('patientAge').value = patient.patient_age || '';
                 sexSelect.value = patient.sex || '';
-                patientIdInput.value = patient.id;
+                patientUidInput.value = patient.uid;
                 setSexFallback(true);
                 setPatientMode('existing');
                 showError('Patient data loaded. Patient fields are now locked.');
             } catch (error) {
-                showError('Patient record not found. Please check the ID and try again.');
-                patientIdInput.value = '';
+                showError('Patient record not found. Please check the UID and try again.');
+                patientUidInput.value = '';
             } finally {
                 lookupPatientButton.disabled = false;
                 lookupPatientButton.textContent = 'Find Patient';
@@ -548,7 +563,7 @@
         });
 
         if (startExistingMode) {
-            existingPatientId.value = '{{ old('patient_id') }}';
+            existingPatientUid.value = '{{ old('patient_uid') }}';
             setPatientMode('existing');
             showError('Existing patient mode selected. Click Find Patient to load records.');
         } else {

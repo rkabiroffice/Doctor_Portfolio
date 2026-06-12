@@ -27,7 +27,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [PublicController::class, 'index'])->name('home');
 Route::post('/appointments', [PublicController::class, 'storeAppointment'])->name('appointments.store');
-Route::get('/appointments/patient/{patient}', [PublicController::class, 'getPatient'])->name('appointments.patient.lookup');
+Route::get('/appointments/patient/{uid}', [PublicController::class, 'getPatientByUid'])->name('appointments.patient.lookup');
 
 Route::get('/admin/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
 Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
